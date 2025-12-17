@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -58,6 +59,7 @@ fun LoginBody() {
         Column (
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.LightGray)
                 .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
@@ -118,6 +120,7 @@ fun LoginBody() {
                     .width(300.dp)
                     .padding(vertical = 5.dp)
             )
+
 //            Button(onClick = {
 //                val intent = Intent(
 //                    context, DashboardActivity::class.java
