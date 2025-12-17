@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">FindGuard</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_signup">SignupActivity</string>
+    <string name="title_activity_forget_password">ForgetPassword</string>
+    <string name="title_activity_splash_screen">SplashScreen</string>
 </resources>
