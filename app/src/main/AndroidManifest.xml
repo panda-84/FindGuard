@@ -23,38 +23,25 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".DashboardActivity"
+            android:exported="true"
+            android:label="@string/title_activity_dashboard"
+            android:theme="@style/Theme.FindGuard" />
+        <activity
             android:name=".ForgetPassword"
             android:exported="true"
             android:label="@string/title_activity_forget_password"
-            android:theme="@style/Theme.FindGuard">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/Theme.FindGuard" />
         <activity
             android:name=".SignupActivity"
             android:exported="true"
             android:label="@string/title_activity_signup"
-            android:theme="@style/Theme.FindGuard">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/Theme.FindGuard" />
         <activity
             android:name=".LoginActivity"
             android:exported="true"
             android:label="@string/title_activity_login"
-            android:theme="@style/Theme.FindGuard">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/Theme.FindGuard" />
     </application>
 
 </manifest>

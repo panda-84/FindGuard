@@ -1,12 +1,15 @@
 package com.example.findguard
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,10 +20,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,127 +33,138 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Black
-import androidx.compose.ui.graphics.Color.Companion.Blue
-import androidx.compose.ui.graphics.Color.Companion.Gray
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.findguard.ui.theme.Purple80
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.findguard.repository.UserRepoImpl
+import com.example.findguard.viewmodel.UserViewModel
+import com.example.findguard.viewmodel.UserViewModelFactory
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent {
-            LoginPreview()
 
+        setContent {
+            val repo = UserRepoImpl()
+            val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory(repo))
+            LoginBody(userViewModel)
         }
     }
 }
+
 @Composable
-fun LoginBody() {
-    var email by remember { mutableStateOf("")}
-    var password by remember { mutableStateOf("")}
-    Scaffold { padding ->
-        Column (
+fun LoginBody(userViewModel: UserViewModel) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    val context = LocalContext.current
+    val activity = context as? Activity
+
+    Scaffold {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.LightGray)
-                .padding(padding),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ){
-            Spacer(modifier = Modifier.height(120.dp)
+                .padding(it),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
 
-            )
             Image(
                 painter = painterResource(R.drawable.logo),
                 contentDescription = null,
                 modifier = Modifier.size(150.dp)
             )
+
             Text(
-                "Login",
+                text = "Login",
                 modifier = Modifier.fillMaxWidth(),
                 style = TextStyle(
                     textAlign = TextAlign.Center,
-                    fontSize = 25.sp,
-                    color = Black,
+                    fontSize = 26.sp,
                     fontWeight = FontWeight.Bold
                 )
-
             )
-            OutlinedTextField(
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                placeholder = { Text("abc@gmail.com") },
                 label = { Text("Email") },
-                colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = Gray,
-                    focusedContainerColor = Purple80,
-                    focusedIndicatorColor = Blue,
-
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                shape = RoundedCornerShape(30.dp),
-                modifier = Modifier
-                    .width(300.dp)
-                    .padding(vertical = 5.dp)
-
-
+                modifier = Modifier.width(300.dp),
+                shape = RoundedCornerShape(30.dp)
             )
 
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                placeholder = { Text("*") },
                 label = { Text("Password") },
-                colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = Gray,
-                    focusedContainerColor = Purple80,
-                    focusedIndicatorColor = Blue,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
+                modifier = Modifier.width(300.dp),
                 shape = RoundedCornerShape(30.dp),
-
-                modifier = Modifier
-                    .width(300.dp)
-                    .padding(vertical = 5.dp)
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
 
-//            Button(onClick = {
-//                val intent = Intent(
-//                    context, DashboardActivity::class.java
-//                )
-//                intent.putExtra("email",email)
-//                intent.putExtra("password",password)
-//                context.startActivity(intent)
-//                activity.finish()
-//
-//            }) {
-//                Text("Login")
-//            }
-//            Text("Don't have an account, Signup", modifier = Modifier.clickable {
-//                val intent = Intent(
-//                    context,
-//                    RegistrationActivity::class.java
-//                )
-//
-//                context.startActivity(intent)
-//                activity.finish()
-//            })
+            Spacer(modifier = Modifier.height(20.dp))
 
+            Button(onClick = {
+                if (email.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT).show()
+                } else {
+                    userViewModel.login(email, password) { success, msg ->
+                        if (success) {
+                            Toast.makeText(context, "Login success", Toast.LENGTH_SHORT).show()
+                            context.startActivity(
+                                Intent(context, DashboardActivity::class.java)
+                            )
+                            activity?.finish()
+                        } else {
+                            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }) {
+                Text("Login")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Don't have an account? Signup",
+                modifier = Modifier.clickable {
+                    context.startActivity(
+                        Intent(context, SignupActivity::class.java)
+                    )
+                }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Forget Password",
+                modifier = Modifier.clickable {
+                    context.startActivity(
+                        Intent(context, ForgetPassword::class.java)
+                    )
+                }
+            )
         }
     }
-
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun LoginPreview() {
-    LoginBody()
+    val repo = UserRepoImpl()
+    val userViewModel = UserViewModel(repo)
+    LoginBody(userViewModel)
 }

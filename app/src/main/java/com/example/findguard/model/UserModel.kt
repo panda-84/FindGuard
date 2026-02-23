@@ -7,13 +7,11 @@ data class UserModel(
     val password: String = "",
 
 ) {
-    fun toMap(): MutableMap<String, Any> {
-        return mutableMapOf(
+    fun toMap(): Map<String, Any> {
+        return mapOf(
             "id" to id,
             "fullName" to fullName,
             "email" to email,
-            "password" to password
-        )
-
+            "password" to password)
     }
 }
