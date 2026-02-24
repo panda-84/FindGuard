@@ -16,6 +16,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Mail
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,7 +29,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,6 +67,7 @@ fun LoginBody(userViewModel: UserViewModel) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var showPassword by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val activity = context as? Activity
@@ -103,6 +106,7 @@ fun LoginBody(userViewModel: UserViewModel) {
 
             Spacer(Modifier.height(30.dp))
 
+            // Email
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
@@ -123,6 +127,7 @@ fun LoginBody(userViewModel: UserViewModel) {
 
             Spacer(Modifier.height(14.dp))
 
+            // Password with Eye Button
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -131,8 +136,23 @@ fun LoginBody(userViewModel: UserViewModel) {
                 leadingIcon = {
                     Icon(Icons.Default.Lock, null, tint = NeonGreen)
                 },
+                trailingIcon = {
+                    IconButton(onClick = { showPassword = !showPassword }) {
+                        Icon(
+                            imageVector = if (showPassword)
+                                Icons.Default.Visibility
+                            else
+                                Icons.Default.VisibilityOff,
+                            contentDescription = null,
+                            tint = NeonGreen
+                        )
+                    }
+                },
                 shape = RoundedCornerShape(14.dp),
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if (showPassword)
+                    VisualTransformation.None
+                else
+                    PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 textStyle = TextStyle(color = Color.White),
                 colors = OutlinedTextFieldDefaults.colors(
