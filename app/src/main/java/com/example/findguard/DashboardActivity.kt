@@ -1,11 +1,13 @@
 package com.example.findguard
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,24 +15,28 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Business
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.findguard.ui.theme.DarkBg
 import com.example.findguard.ui.theme.FindGuardTheme
+import com.example.findguard.ui.theme.NeonBlue
+import com.example.findguard.ui.theme.NeonGreen
+
+/* ---------------- ACTIVITY ---------------- */
 
 class DashboardActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
         setContent {
             FindGuardTheme {
                 MainScreen()
@@ -39,43 +45,36 @@ class DashboardActivity : ComponentActivity() {
     }
 }
 
-/* ---------- MAIN SCREEN ---------- */
+/* ---------------- MAIN SCREEN ---------------- */
 
 @Composable
 fun MainScreen() {
     var selectedIndex by remember { mutableIntStateOf(0) }
 
     Scaffold(
+        containerColor = DarkBg,
         bottomBar = {
-            NavigationBar(containerColor = MaterialTheme.colorScheme.secondary) {
-                NavigationBarItem(
-                    selected = selectedIndex == 0,
-                    onClick = { selectedIndex = 0 },
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-                    label = { Text("Home") }
-                )
-
-                NavigationBarItem(
-                    selected = selectedIndex == 1,
-                    onClick = { selectedIndex = 1 },
-                    icon = { Icon(Icons.Default.Business, contentDescription = "Company") },
-                    label = { Text("Company") }
-                )
-
-                NavigationBarItem(
-                    selected = selectedIndex == 2,
-                    onClick = { selectedIndex = 2 },
-                    icon = { Icon(Icons.Default.Security, contentDescription = "Guards") },
-                    label = { Text("Guards") }
-                )
+            NavigationBar(containerColor = Color.Black) {
+                listOf(
+                    Icons.Default.Home to "Home",
+                    Icons.Default.Business to "Company",
+                    Icons.Default.Security to "Guards"
+                ).forEachIndexed { index, pair ->
+                    NavigationBarItem(
+                        selected = selectedIndex == index,
+                        onClick = { selectedIndex = index },
+                        icon = { Icon(pair.first, null, tint = NeonBlue) },
+                        label = { Text(pair.second, color = NeonBlue) }
+                    )
+                }
             }
         }
-    ) { paddingValues ->
+    ) { padding ->
         Box(
             modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
+                .padding(padding)
+                .fillMaxSize()
+                .background(DarkBg)
         ) {
             when (selectedIndex) {
                 0 -> HomeScreen()
@@ -86,197 +85,180 @@ fun MainScreen() {
     }
 }
 
-/* ---------- HOME / INTRO ---------- */
+/* ---------------- HOME SCREEN ---------------- */
 
 @Composable
 fun HomeScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Welcome to FindGuard 🛡️",
-            style = MaterialTheme.typography.headlineLarge,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        Text(
-            text = "Your trusted security partner",
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center
-        )
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+
+    Box(modifier = Modifier.fillMaxSize().padding(20.dp)) {
+
+        // 🔓 WORKING LOGOUT
+        IconButton(
+            modifier = Modifier.align(Alignment.TopEnd),
+            onClick = {
+                prefs.edit().clear().apply()
+
+                context.startActivity(
+                    Intent(context, LoginActivity::class.java)
+                )
+                (context as ComponentActivity).finish()
+            }
+        ) {
+            Icon(Icons.Default.Logout, null, tint = NeonGreen)
+        }
+
+        Column(
+            modifier = Modifier.align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                "FindGuard 🛡️",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.ExtraBold,
+                color = NeonBlue
+            )
+            Spacer(Modifier.height(12.dp))
+            Text(
+                "Elite Security Services Across Nepal",
+                color = Color.LightGray,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 
-/* ---------- COMPANY SCREEN ---------- */
+/* ---------------- COMPANY SCREEN ---------------- */
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CompanyScreen() {
-    val context = LocalContext.current
 
-    // Sample data
-    val companies = listOf("ABC Security Pvt. Ltd.", "XYZ Security Co.")
+    val companies = listOf(
+        "ABC Security Pvt. Ltd.",
+        "Himal Secure Service",
+        "Everest Protection Group",
+        "Nepal Guard Force"
+    )
+
     val guardsByCompany = mapOf(
         "ABC Security Pvt. Ltd." to listOf(
-            GuardData("Ram Bahadur", 5, 20, "Armed, First Aid, CCTV"),
-            GuardData("Sita Shrestha", 3, 18, "First Aid, CCTV")
+            GuardData("Ram Bahadur", 6, 1800, "Day", "Kathmandu", 4.8f, "Armed"),
+            GuardData("Sita Shrestha", 4, 1600, "Night", "Lalitpur", 4.6f, "CCTV")
         ),
-        "XYZ Security Co." to listOf(
-            GuardData("Hari Lama", 4, 22, "Armed, CCTV"),
-            GuardData("Gita Khatri", 2, 15, "CCTV, Night Shift")
+        "Himal Secure Service" to listOf(
+            GuardData("Hari Lama", 8, 2200, "Day", "Bhaktapur", 4.9f, "VIP"),
+            GuardData("Gita Khatri", 3, 1400, "Night", "Kathmandu", 4.3f, "Night Patrol")
+        ),
+        "Everest Protection Group" to listOf(
+            GuardData("Nabin Rai", 7, 2100, "Day", "Pokhara", 4.7f, "Armed"),
+            GuardData("Sunita Gurung", 5, 1700, "Night", "Pokhara", 4.5f, "CCTV")
+        ),
+        "Nepal Guard Force" to listOf(
+            GuardData("Bikash Thapa", 9, 2500, "Day", "Kathmandu", 5.0f, "VIP Escort")
         )
     )
 
-    var expandedCompany by remember { mutableStateOf<String?>(null) }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedCompany by remember { mutableStateOf(companies.first()) }
     var selectedGuard by remember { mutableStateOf<GuardData?>(null) }
-    var showDialog by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text(
-            text = "Security Companies",
-            style = MaterialTheme.typography.headlineMedium
-        )
-        Spacer(modifier = Modifier.height(16.dp))
 
-        companies.forEach { company ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .padding(vertical = 4.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(6.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp)
-                ) {
-                    Text(
-                        text = company,
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                expandedCompany =
-                                    if (expandedCompany == company) null else company
-                            }
+        Text("Select Company", color = NeonGreen, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(10.dp))
+
+        ExposedDropdownMenuBox(expanded, { expanded = !expanded }) {
+            OutlinedTextField(
+                value = selectedCompany,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Security Company") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+                modifier = Modifier.menuAnchor().fillMaxWidth()
+            )
+
+            ExposedDropdownMenu(expanded, { expanded = false }) {
+                companies.forEach { company ->
+                    DropdownMenuItem(
+                        text = { Text(company) },
+                        onClick = {
+                            selectedCompany = company
+                            expanded = false
+                        }
                     )
-
-                    if (expandedCompany == company) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        // Show guards in grid
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(3),
-                            modifier = Modifier.height(150.dp),
-                            content = {
-                                items(guardsByCompany[company] ?: emptyList()) { guard ->
-                                    Card(
-                                        modifier = Modifier
-                                            .padding(4.dp)
-                                            .fillMaxSize()
-                                            .clickable {
-                                                selectedGuard = guard
-                                                showDialog = true
-                                            },
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = MaterialTheme.colorScheme.primaryContainer
-                                        ),
-                                        elevation = CardDefaults.cardElevation(4.dp)
-                                    ) {
-                                        Box(
-                                            contentAlignment = Alignment.Center,
-                                            modifier = Modifier.fillMaxSize().padding(8.dp)
-                                        ) {
-                                            Text(
-                                                text = guard.name,
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                textAlign = TextAlign.Center
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        )
-                    }
                 }
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        LazyVerticalGrid(columns = GridCells.Fixed(3)) {
+            items(guardsByCompany[selectedCompany] ?: emptyList()) { guard ->
+                GuardCard(guard) { selectedGuard = guard }
             }
         }
     }
 
-    // Guard booking dialog
-    selectedGuard?.let { guard ->
-        if (showDialog) {
-            BookingDialog(guard) { showDialog = false }
-        }
+    selectedGuard?.let {
+        BookingDialog(it) { selectedGuard = null }
     }
 }
 
-/* ---------- GUARDS SCREEN ---------- */
+/* ---------------- GUARDS SCREEN ---------------- */
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GuardsScreen() {
-    val context = LocalContext.current
-
     val guards = listOf(
-        GuardData("Ram Bahadur", 5, 20, "Armed, First Aid, CCTV"),
-        GuardData("Sita Shrestha", 3, 18, "First Aid, CCTV"),
-        GuardData("Hari Lama", 4, 22, "Armed, CCTV"),
-        GuardData("Gita Khatri", 2, 15, "CCTV, Night Shift")
+        GuardData("Ram Bahadur", 6, 1800, "Day", "Kathmandu", 4.8f, "Armed"),
+        GuardData("Hari Lama", 8, 2200, "Day", "Bhaktapur", 4.9f, "VIP"),
+        GuardData("Sunita Gurung", 5, 1700, "Night", "Pokhara", 4.5f, "CCTV"),
+        GuardData("Bikash Thapa", 9, 2500, "Day", "Kathmandu", 5.0f, "VIP Escort"),
+        GuardData("Nabin Rai", 7, 2100, "Day", "Pokhara", 4.7f, "Armed")
     )
 
     var selectedGuard by remember { mutableStateOf<GuardData?>(null) }
-    var showDialog by remember { mutableStateOf(false) }
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        content = {
-            items(guards) { guard ->
-                Card(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxSize()
-                        .clickable {
-                            selectedGuard = guard
-                            showDialog = true
-                        },
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(6.dp)
-                ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .height(150.dp)
-                            .width(100.dp)
-                            .padding(16.dp)
-                    ) {
-                        Text(
-                            text = guard.name,
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-            }
+        modifier = Modifier.fillMaxSize().padding(16.dp)
+    ) {
+        items(guards) {
+            GuardCard(it) { selectedGuard = it }
         }
-    )
+    }
 
-    selectedGuard?.let { guard ->
-        if (showDialog) {
-            BookingDialog(guard) { showDialog = false }
+    selectedGuard?.let {
+        BookingDialog(it) { selectedGuard = null }
+    }
+}
+
+/* ---------------- GUARD CARD ---------------- */
+
+@Composable
+fun GuardCard(guard: GuardData, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF10172A)),
+        border = BorderStroke(1.dp, NeonBlue),
+        elevation = CardDefaults.cardElevation(10.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(Icons.Default.Person, null, tint = NeonGreen, modifier = Modifier.size(36.dp))
+            Text(guard.name, fontWeight = FontWeight.Bold, color = Color.White)
+            Text("⭐ ${guard.rating}", color = Color.LightGray)
+            Text("Rs. ${guard.pricePerHour}/hr", color = NeonBlue)
         }
     }
 }
 
-/* ---------- BOOKING DIALOG ---------- */
+/* ---------------- BOOKING DIALOG ---------------- */
 
 @Composable
 fun BookingDialog(guard: GuardData, onDismiss: () -> Unit) {
@@ -284,22 +266,22 @@ fun BookingDialog(guard: GuardData, onDismiss: () -> Unit) {
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Book ${guard.name}") },
+        title = { Text("Confirm Booking") },
         text = {
             Column {
+                Text("Name: ${guard.name}")
                 Text("Experience: ${guard.experience} years")
-                Spacer(modifier = Modifier.height(4.dp))
+                Text("Shift: ${guard.shift}")
+                Text("Location: ${guard.location}")
                 Text("Features: ${guard.features}")
-                Spacer(modifier = Modifier.height(4.dp))
-                Text("Price per hour: \$${guard.pricePerHour}")
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Click Confirm to book this guard.", style = MaterialTheme.typography.bodySmall)
+                Spacer(Modifier.height(8.dp))
+                Text("Rs. ${guard.pricePerHour} / hour", fontWeight = FontWeight.Bold)
             }
         },
         confirmButton = {
             TextButton(onClick = {
+                Toast.makeText(context, "Guard Booked Successfully", Toast.LENGTH_SHORT).show()
                 onDismiss()
-                Toast.makeText(context, "${guard.name} booked successfully!", Toast.LENGTH_SHORT).show()
             }) { Text("Confirm") }
         },
         dismissButton = {
@@ -308,21 +290,22 @@ fun BookingDialog(guard: GuardData, onDismiss: () -> Unit) {
     )
 }
 
-/* ---------- DATA CLASS ---------- */
+/* ---------------- DATA CLASS ---------------- */
 
 data class GuardData(
     val name: String,
     val experience: Int,
     val pricePerHour: Int,
+    val shift: String,
+    val location: String,
+    val rating: Float,
     val features: String
 )
 
-/* ---------- PREVIEW ---------- */
+/* ---------------- PREVIEW ---------------- */
 
 @Preview(showBackground = true)
 @Composable
-fun DashboardPreview() {
-    FindGuardTheme {
-        MainScreen()
-    }
+fun PreviewDashboard() {
+    FindGuardTheme { MainScreen() }
 }
