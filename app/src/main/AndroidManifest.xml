@@ -12,6 +12,50 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FindGuard">
         <activity
+            android:name=".SharedComponents"
+            android:exported="true"
+            android:label="@string/title_activity_shared_components"
+            android:theme="@style/Theme.FindGuard">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Guarddata"
+            android:exported="true"
+            android:label="@string/title_activity_guarddata"
+            android:theme="@style/Theme.FindGuard">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".GuardsScreen"
+            android:exported="true"
+            android:label="@string/title_activity_guards_screen"
+            android:theme="@style/Theme.FindGuard">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".CompanyScreen"
+            android:exported="true"
+            android:label="@string/title_activity_company_screen"
+            android:theme="@style/Theme.FindGuard">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".SplashScreen"
             android:exported="true"
             android:label="@string/title_activity_splash_screen"

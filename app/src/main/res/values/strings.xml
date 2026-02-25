@@ -5,4 +5,8 @@
     <string name="title_activity_forget_password">ForgetPassword</string>
     <string name="title_activity_splash_screen">SplashScreen</string>
     <string name="title_activity_dashboard">DashboardActivity</string>
+    <string name="title_activity_company_screen">CompanyScreen</string>
+    <string name="title_activity_guards_screen">GuardsScreen</string>
+    <string name="title_activity_guarddata">Guarddata</string>
+    <string name="title_activity_shared_components">SharedComponents</string>
 </resources>
