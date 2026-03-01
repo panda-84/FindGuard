@@ -20,12 +20,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -38,7 +38,6 @@ import com.example.findguard.ui.theme.NeonGreen
 import com.example.findguard.viewmodel.UserViewModel
 import com.example.findguard.viewmodel.UserViewModelFactory
 
-/* ---------- ACTIVITY ---------- */
 class SignupActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +53,6 @@ class SignupActivity : ComponentActivity() {
     }
 }
 
-/* ---------- UI ---------- */
 @Composable
 fun SignUpBody(onSuccess: () -> Unit = {}) {
     var fullName by remember { mutableStateOf("") }
@@ -82,31 +80,17 @@ fun SignUpBody(onSuccess: () -> Unit = {}) {
                 contentDescription = null,
                 modifier = Modifier.size(140.dp)
             )
-
             Spacer(Modifier.height(16.dp))
-
-            Text(
-                text = "Sign Up",
-                fontSize = 30.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = NeonBlue
-            )
-
-            Text(
-                text = "Create your account",
-                color = NeonGray,
-                fontSize = 14.sp
-            )
-
+            Text("Sign Up", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = NeonBlue)
+            Text("Create your account", color = NeonGray, fontSize = 14.sp)
             Spacer(Modifier.height(30.dp))
 
             // Full Name
             OutlinedTextField(
                 value = fullName,
                 onValueChange = { fullName = it },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag("fullName"), // ← testTag
                 label = { Text("Full Name", color = NeonGray) },
-                placeholder = { Text("", color = NeonGray) },
                 shape = RoundedCornerShape(14.dp),
                 textStyle = TextStyle(color = Color.White),
                 singleLine = true,
@@ -117,16 +101,14 @@ fun SignUpBody(onSuccess: () -> Unit = {}) {
                     cursorColor = NeonBlue
                 )
             )
-
             Spacer(Modifier.height(14.dp))
 
             // Email
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag("email"), // ← testTag
                 label = { Text("Email", color = NeonGray) },
-                placeholder = { Text("abc@gmail.com", color = NeonGray) },
                 shape = RoundedCornerShape(14.dp),
                 textStyle = TextStyle(color = Color.White),
                 singleLine = true,
@@ -137,16 +119,14 @@ fun SignUpBody(onSuccess: () -> Unit = {}) {
                     cursorColor = NeonBlue
                 )
             )
-
             Spacer(Modifier.height(14.dp))
 
-            // Password with show/hide
+            // Password
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag("password"), // ← testTag
                 label = { Text("Password", color = NeonGray) },
-                placeholder = { Text("", color = NeonGray) },
                 shape = RoundedCornerShape(14.dp),
                 textStyle = TextStyle(color = Color.White),
                 singleLine = true,
@@ -167,7 +147,6 @@ fun SignUpBody(onSuccess: () -> Unit = {}) {
                     cursorColor = NeonGreen
                 )
             )
-
             Spacer(Modifier.height(14.dp))
 
             // Terms checkbox
@@ -175,6 +154,7 @@ fun SignUpBody(onSuccess: () -> Unit = {}) {
                 Checkbox(
                     checked = checkbox,
                     onCheckedChange = { checkbox = it },
+                    modifier = Modifier.testTag("termsCheckbox"), // ← testTag
                     colors = CheckboxDefaults.colors(
                         checkmarkColor = Color.Black,
                         checkedColor = NeonGreen
@@ -183,10 +163,9 @@ fun SignUpBody(onSuccess: () -> Unit = {}) {
                 Spacer(Modifier.width(6.dp))
                 Text("I agree to Terms & Conditions", color = NeonGray)
             }
-
             Spacer(Modifier.height(24.dp))
 
-            // Sign Up button
+            // Sign Up Button
             Button(
                 onClick = {
                     if (!checkbox) {
@@ -196,12 +175,7 @@ fun SignUpBody(onSuccess: () -> Unit = {}) {
                     } else {
                         userViewModel.signup(email, password) { success, message, userId ->
                             if (success) {
-                                val userModel = UserModel(
-                                    id = userId,
-                                    fullName = fullName,
-                                    email = email,
-                                    password = password
-                                )
+                                val userModel = UserModel(id = userId, fullName = fullName, email = email, password = password)
                                 userViewModel.addUserToDatabase(userId, userModel) { dbSuccess, dbMessage ->
                                     if (dbSuccess) {
                                         Toast.makeText(context, "Registration Success", Toast.LENGTH_SHORT).show()
@@ -216,31 +190,23 @@ fun SignUpBody(onSuccess: () -> Unit = {}) {
                         }
                     }
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(54.dp),
+                modifier = Modifier.fillMaxWidth().height(54.dp).testTag("signUpButton"), // ← testTag
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = NeonBlue)
             ) {
                 Text("SIGN UP", fontWeight = FontWeight.Bold, color = Color.Black)
             }
-
             Spacer(Modifier.height(16.dp))
 
             Text(
                 text = "Do have an account? Login",
                 color = NeonGray,
-                modifier = Modifier.clickable {
-                    context.startActivity(Intent(context, LoginActivity::class.java))
-                }
+                modifier = Modifier
+                    .testTag("loginLink") // ← testTag
+                    .clickable {
+                        context.startActivity(Intent(context, LoginActivity::class.java))
+                    }
             )
         }
     }
-}
-
-/* ---------- PREVIEW ---------- */
-@Preview(showBackground = true)
-@Composable
-fun SignUpPreview() {
-    SignUpBody()
 }

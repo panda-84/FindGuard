@@ -24,13 +24,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -38,19 +38,14 @@ import com.example.findguard.repository.UserRepoImpl
 import com.example.findguard.viewmodel.UserViewModel
 import com.example.findguard.viewmodel.UserViewModelFactory
 
-/* ---------- NEON THEME COLORS ---------- */
-
 private val DarkBg = Color(0xFF0B0F1A)
 private val NeonBlue = Color(0xFF00E5FF)
 private val NeonGreen = Color(0xFF1DE9B6)
-
-/* ---------- ACTIVITY ---------- */
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
         setContent {
             val repo = UserRepoImpl()
             val userViewModel: UserViewModel =
@@ -59,8 +54,6 @@ class LoginActivity : ComponentActivity() {
         }
     }
 }
-
-/* ---------- UI ---------- */
 
 @Composable
 fun LoginBody(userViewModel: UserViewModel) {
@@ -110,7 +103,9 @@ fun LoginBody(userViewModel: UserViewModel) {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("email"),        // ← testTag added
                 label = { Text("Email", color = Color.LightGray) },
                 leadingIcon = {
                     Icon(Icons.Default.Mail, null, tint = NeonBlue)
@@ -127,11 +122,13 @@ fun LoginBody(userViewModel: UserViewModel) {
 
             Spacer(Modifier.height(14.dp))
 
-            // Password with Eye Button
+            // Password
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("password"),     // ← testTag added
                 label = { Text("Password", color = Color.LightGray) },
                 leadingIcon = {
                     Icon(Icons.Default.Lock, null, tint = NeonGreen)
@@ -185,7 +182,8 @@ fun LoginBody(userViewModel: UserViewModel) {
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(54.dp),
+                    .height(54.dp)
+                    .testTag("loginButton"),  // ← testTag added
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = NeonBlue)
             ) {
@@ -197,11 +195,13 @@ fun LoginBody(userViewModel: UserViewModel) {
             Text(
                 text = "Forgot Password?",
                 color = NeonGreen,
-                modifier = Modifier.clickable {
-                    context.startActivity(
-                        Intent(context, ForgetPassword::class.java)
-                    )
-                }
+                modifier = Modifier
+                    .testTag("forgotPassword")  // ← testTag added
+                    .clickable {
+                        context.startActivity(
+                            Intent(context, ForgetPassword::class.java)
+                        )
+                    }
             )
 
             Spacer(Modifier.height(12.dp))
@@ -209,22 +209,14 @@ fun LoginBody(userViewModel: UserViewModel) {
             Text(
                 text = "Don't have an account? Sign Up",
                 color = Color.LightGray,
-                modifier = Modifier.clickable {
-                    context.startActivity(
-                        Intent(context, SignupActivity::class.java)
-                    )
-                }
+                modifier = Modifier
+                    .testTag("signUpLink")      // ← testTag added
+                    .clickable {
+                        context.startActivity(
+                            Intent(context, SignupActivity::class.java)
+                        )
+                    }
             )
         }
     }
-}
-
-/* ---------- PREVIEW ---------- */
-
-@Preview(showBackground = true)
-@Composable
-fun LoginPreview() {
-    val repo = UserRepoImpl()
-    val vm = UserViewModel(repo)
-    LoginBody(vm)
 }

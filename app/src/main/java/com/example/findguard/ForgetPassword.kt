@@ -18,11 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -34,19 +34,13 @@ import com.example.findguard.ui.theme.NeonGreen
 import com.example.findguard.viewmodel.UserViewModel
 import com.example.findguard.viewmodel.UserViewModelFactory
 
-/* ---------- ACTIVITY ---------- */
-
 class ForgetPassword : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent {
-            ForgetPasswordBody()
-        }
+        setContent { ForgetPasswordBody() }
     }
 }
-
-/* ---------- UI ---------- */
 
 @Composable
 fun ForgetPasswordBody() {
@@ -65,35 +59,21 @@ fun ForgetPasswordBody() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-
             Image(
                 painter = painterResource(R.drawable.logo),
                 contentDescription = null,
                 modifier = Modifier.size(140.dp)
             )
-
             Spacer(Modifier.height(16.dp))
-
-            Text(
-                text = "FindGuard",
-                fontSize = 30.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = NeonBlue
-            )
-
-            Text(
-                text = "Reset your password",
-                color = NeonGray,
-                fontSize = 14.sp
-            )
-
+            Text("FindGuard", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = NeonBlue)
+            Text("Reset your password", color = NeonGray, fontSize = 14.sp)
             Spacer(Modifier.height(30.dp))
 
             // Email Input
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag("email"), // ← testTag
                 label = { Text("Email", color = NeonGray) },
                 placeholder = { Text("abc@gmail.com", color = NeonGray) },
                 shape = RoundedCornerShape(14.dp),
@@ -107,7 +87,6 @@ fun ForgetPasswordBody() {
                     cursorColor = NeonBlue
                 )
             )
-
             Spacer(Modifier.height(24.dp))
 
             Button(
@@ -122,30 +101,24 @@ fun ForgetPasswordBody() {
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(54.dp),
+                    .height(54.dp)
+                    .testTag("sendResetButton"), // ← testTag
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = NeonGreen)
             ) {
                 Text("SEND RESET LINK", fontWeight = FontWeight.Bold, color = Color.Black)
             }
-
             Spacer(Modifier.height(18.dp))
 
             Text(
                 text = "Back to Login",
                 color = NeonBlue,
-                modifier = Modifier.clickable {
-                    context.startActivity(Intent(context, LoginActivity::class.java))
-                }
+                modifier = Modifier
+                    .testTag("backToLogin") // ← testTag
+                    .clickable {
+                        context.startActivity(Intent(context, LoginActivity::class.java))
+                    }
             )
         }
     }
-}
-
-/* ---------- PREVIEW ---------- */
-
-@Preview(showBackground = true)
-@Composable
-fun ForgetPasswordPreview() {
-    ForgetPasswordBody()
 }
